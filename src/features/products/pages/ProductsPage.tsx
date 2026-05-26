@@ -3,16 +3,18 @@ import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import type { Product } from '../types'
 import { useCategories } from '@/features/categories/hooks/useCategories'
+import { useIngredients } from '@/features/ingredients/hooks/useIngredients'
 
 export default function ProductsPage() {
   const [open, setOpen] = useState(false)
   const { data, isLoading, error, mutate, isPending, update, isUpdating } = useProducts()
   const {data: categories} = useCategories()
+  const {data: ingredients} = useIngredients()
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
   const form = useForm({
-    defaultValues: {nombre: '', precio_base: 0, descripcion: '', categoria_id: 0},
+    defaultValues: {nombre: '', precio_base: 0, descripcion: '', categoria_id: 0, ingrediente_ids: [] as number[]},
     onSubmit: async({value}) => {
       if (editingProduct) {
         update({id: editingProduct.id, body:value})
@@ -22,8 +24,7 @@ export default function ProductsPage() {
           imagenes_url: [],
           disponible: true,
           stock_cantidad: 0,
-          ingrediente_ids: [],
-      })
+        })
       }
       setOpen(false)
       setEditingProduct(null)
@@ -36,6 +37,7 @@ export default function ProductsPage() {
     form.setFieldValue('precio_base', product.precio_base)
     form.setFieldValue('descripcion', product.descripcion ?? '')
     form.setFieldValue('categoria_id', product.categoria_id)
+    form.setFieldValue('ingrediente_ids', product.ingrediente_ids)
     setOpen(true)
   }
 
@@ -129,7 +131,30 @@ export default function ProductsPage() {
                     </select>
                   )}
                 </form.Field>
-
+                <form.Field name="ingrediente_ids">
+                  {(field) => (
+                    <div className='flex flex-col gap-1 max-h-40 overflow-y-auto'>
+                      <label className='font-medium text-sm'>Ingredientes</label>
+                      {ingredients?.map((ing) => (
+                        <label key={ing.id} className='flex items-center gap-2'>
+                          <input
+                            type='checkbox'
+                            checked={field.state.value.includes(ing.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                field.handleChange([...field.state.value, ing.id])
+                              } else {
+                                field.handleChange(field.state.value.filter((id) => id !== ing.id))
+                              }
+                            }}
+                          />
+                          {ing.nombre}
+                          {ing.es_alergeno && <span className='text-xs text-red-500'>(alérgeno)</span>}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </form.Field>
 
                 <div className='flex justify-end gap-2'>
                   <button
