@@ -1,8 +1,21 @@
-import React from 'react'
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import AdminLayout from '@/shared/layouts/AdminLayout'
+import ProductsPage from "@/features/products/pages/ProductsPage";
+import CategoriesPage from "@/features/categories/pages/CategoriesPage";
 
-const AppRouter: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  // Placeholder router. Replace with react-router implementation when ready.
-  return <>{children}</>
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <AdminLayout/>,
+    children:[
+      {index: true, element: <Navigate to="/products" replace/>},
+      {path: 'products', element: <ProductsPage/>},
+      {path: 'categories', element: <CategoriesPage/>},
+      {path: 'ingredients', element: <div className="p-6">Ingredientes</div>},
+    ],
+  },
+])
+
+export default function AppRouter() {
+  return <RouterProvider router={router}/>
 }
-
-export default AppRouter

@@ -1,17 +1,29 @@
-import { useEffect, useState } from 'react'
-import type { Product } from '../types'
-import { fetchProducts } from '../services'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createProduct, fetchProducts, updateProduct } from '../services'
+import type { CreateProductDto } from '../types'
 
 export const useProducts = () => {
-  const [items, setItems] = useState<Product[] | null>(null)
-  const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    setLoading(true)
-    fetchProducts()
-      .then((data) => setItems(data))
-      .finally(() => setLoading(false))
-  }, [])
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProducts,
+  })
 
-  return { items, loading }
+  const { mutate, isPending } = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
+  })
+
+  const { mutate: update, isPending: isUpdating } = useMutation({
+    mutationFn: ({ id, body }: { id: number; body: Partial<CreateProductDto> }) =>
+      updateProduct(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
+  })
+
+  return { data, isLoading, error, mutate, isPending, update, isUpdating }
 }
