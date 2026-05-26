@@ -15,7 +15,7 @@ export default function CategoriesPage() {
             if (editingCategory) {
                 update({id: editingCategory.id, body: value})
             } else {
-                mutate({...value, parent_id: 0})
+                mutate({...value, parent_id: null, imagen_url: value.imagen_url || null})
             }
             setOpen(false)
             setEditingCategory(null)
