@@ -6,10 +6,10 @@ import IngredientsPage from "@/features/ingredients/pages/IngredientsPage";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: '/', //Ruta padre
     element: <AdminLayout/>,
     children:[
-      {index: true, element: <Navigate to="/products" replace/>},
+      {index: true, element: <Navigate to="/products" replace/>}, //Redirige a productos cuando la URL es "/"
       {path: 'products', element: <ProductsPage/>},
       {path: 'categories', element: <CategoriesPage/>},
       {path: 'ingredients', element: <IngredientsPage/>},

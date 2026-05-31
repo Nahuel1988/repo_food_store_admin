@@ -6,41 +6,46 @@ import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useIngredients } from '@/features/ingredients/hooks/useIngredients'
 
 export default function ProductsPage() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false) //Modal visible o no
+  //Trae datos de productos, categorias e ingredientes
   const { data, isLoading, error, mutate, isPending, update, isUpdating } = useProducts()
-  const {data: categories} = useCategories()
-  const {data: ingredients} = useIngredients()
+  const { data: categories } = useCategories()
+  const { data: ingredients } = useIngredients()
 
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  //Guarda el producto que se está editando
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)//Product = editar | null = crear
 
   const form = useForm({
-    defaultValues: {nombre: '', precio_base: 0, descripcion: '', categoria_id: 0, ingrediente_ids: [] as number[]},
-    onSubmit: async({value}) => {
-      if (editingProduct) {
-        update({id: editingProduct.id, body:value})
-      } else {
-        mutate({
-          ...value,
+    defaultValues: {nombre: '', precio_base: 0, descripcion: '', categoria_id: 0, ingrediente_ids: [] as number[]}, //Valores default (ingrediente_ids es array de numeros)
+    onSubmit: async({value}) => { //value tiene todos los campos del form
+      if (editingProduct) { //Si se está editando
+        update({id: editingProduct.id, body:value}) //Patch
+      } else { //Si está creando
+        mutate({ //Post
+          ...value, //Copia los campos de value y agrega los que faltan hardcodeados
           imagenes_url: [],
           disponible: true,
           stock_cantidad: 0,
         })
       }
+      //Cierra modal y edición
       setOpen(false)
       setEditingProduct(null)
     },
   })
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product)
+  const handleEdit = (product: Product) => { //Al editar
+    setEditingProduct(product) //Guarda el producto en el state
+    //Llena el form con los datos. setFieldValue actualiza cada campo en el estado del form
     form.setFieldValue('nombre', product.nombre)
     form.setFieldValue('precio_base', product.precio_base)
-    form.setFieldValue('descripcion', product.descripcion ?? '')
+    form.setFieldValue('descripcion', product.descripcion ?? '') //Si no hay descripción guarda ''
     form.setFieldValue('categoria_id', product.categoria_id)
     form.setFieldValue('ingrediente_ids', product.ingrediente_ids)
     setOpen(true)
   }
 
+  //Estados de carga
   if (isLoading) return <div>Cargando...</div>
   if (error) return <div>Error al cargar productos</div>
 
@@ -49,23 +54,24 @@ export default function ProductsPage() {
     <div className='p-6'>
       <div className='flex justify-between items-center mb-6'>
         <h1 className='text-2xl font-bold'>Productos</h1>
-        <button
+        <button /*Botón de crear producto*/
           onClick={() => {
             form.reset()
             setEditingProduct(null)
             setOpen(true)
           }}
           className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'>
-            Nuevo producto
-          </button>
+            Nuevo Producto
+        </button>
       </div>
       
+      {/*Lista*/}
       <ul className='flex flex-col gap-2'>
-        {data?.map((p) => (
+        {data?.map((p) => ( /*Si no hay data no llama a .map()*/
           <li key={p.id} className='border rounded p-4 flex justify-between items-center'>
             <div>
               <span className='font-medium'>{p.nombre}</span> - ${p.precio_base}
-              {p.descripcion && <p className='text-gray-500 text-sm'>{p.descripcion}</p>}
+              {p.descripcion && <p className='text-gray-500 text-sm'>{p.descripcion}</p>} {/*Si no hay descripcion no renderiza el párrafo*/}
             </div>
             <button
               onClick={() => handleEdit(p)}
@@ -74,15 +80,16 @@ export default function ProductsPage() {
         ))}
       </ul>
 
-      {open && (
+      {/*Modal*/}
+      {open && ( /*Si open es true*/
         <div className='fixed inset-0 bg-black/50 flex items-center justify-center'>
           <div className='bg-white rounded-lg p-6 w-full max-w-md'>
             <h2 className='text-lg font-bold mb-4'>
               {editingProduct ? 'Editar producto' : 'Nuevo Producto'}</h2>
-            <form
+            <form /*Formulario*/
               onSubmit={(e) => {
-                e.preventDefault()
-                form.handleSubmit()
+                e.preventDefault() /*Evita que el form recargue la página*/
+                form.handleSubmit() /*Ejecuta onSubmit*/
               }}
               className='flex flex-col gap-4'>
                 <form.Field name="nombre">
@@ -139,7 +146,7 @@ export default function ProductsPage() {
                         <label key={ing.id} className='flex items-center gap-2'>
                           <input
                             type='checkbox'
-                            checked={field.state.value.includes(ing.id)}
+                            checked={field.state.value.includes(ing.id)} /*Verifica si el checkbox debe estar marcado*/
                             onChange={(e) => {
                               if (e.target.checked) {
                                 field.handleChange([...field.state.value, ing.id])
