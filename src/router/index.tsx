@@ -5,6 +5,7 @@ import CategoriesPage from "@/features/categories/pages/CategoriesPage";
 import IngredientsPage from "@/features/ingredients/pages/IngredientsPage";
 import ProtectedRoute from "@/shared/components/ProtectedRoute";
 import LoginPage from "@/features/auth/pages/LoginPage";
+import OrdersPage from "@/features/orders/pages/OrdersPage";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,11 @@ const router = createBrowserRouter([
           element: <ProtectedRoute roles={['ADMIN']}/>,
           children:[{index: true, element: <IngredientsPage/>}]
         },
+        {
+          path: 'orders',
+          element: <ProtectedRoute roles={['ADMIN', 'PEDIDOS']}/>,
+          children:[{index: true, element: <OrdersPage/>}]
+        }
       ]}
     ],
   },
