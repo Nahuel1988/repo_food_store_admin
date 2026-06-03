@@ -8,7 +8,7 @@ import { useIngredients } from '@/features/ingredients/hooks/useIngredients'
 export default function ProductsPage() {
   const [open, setOpen] = useState(false) //Modal visible o no
   //Trae datos de productos, categorias e ingredientes
-  const { data, isLoading, error, mutate, isPending, update, isUpdating } = useProducts()
+  const { data, isLoading, error, mutate, isPending, update, isUpdating, remove, isDeleting } = useProducts()
   const { data: categories } = useCategories()
   const { data: ingredients } = useIngredients()
 
@@ -73,9 +73,20 @@ export default function ProductsPage() {
               <span className='font-medium'>{p.nombre}</span> - ${p.precio_base}
               {p.descripcion && <p className='text-gray-500 text-sm'>{p.descripcion}</p>} {/*Si no hay descripcion no renderiza el párrafo*/}
             </div>
-            <button
-              onClick={() => handleEdit(p)}
-              className='text-sm border px-3 py-1 rounded hover:bg-gray-100'>Editar</button>
+            <div className='flex gap-2'>
+              <button
+                onClick={() => handleEdit(p)}
+                className='text-sm border px-3 py-1 rounded hover:bg-gray-100'>
+                  Editar
+              </button>
+              <button
+                onClick={() => remove(p.id)}
+                disabled={isDeleting}
+                className='text-sm border px-3 py-1 rounded hover:bg-red-50 text-red-600 disabled:opacity-50'>
+                  Eliminar
+              </button>
+            </div>
+
           </li>
         ))}
       </ul>

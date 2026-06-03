@@ -7,7 +7,7 @@ import type { Category } from '../types'
 export default function CategoriesPage() {
     const [open, setOpen] = useState(false)
     const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-    const {data, isLoading, error, mutate, isPending, update, isUpdating} = useCategories()
+    const {data, isLoading, error, mutate, isPending, update, isUpdating, remove, isDeleting} = useCategories()
 
     const form = useForm({
         defaultValues: {nombre: '', descripcion: '', imagen_url: ''},
@@ -52,9 +52,19 @@ export default function CategoriesPage() {
                             <span className='font-medium'>{c.nombre}</span>
                             {c.descripcion && <p className='text-gray-500 text-sm'>{c.descripcion}</p>}
                         </div>
-                        <button
-                            onClick={() => handleEdit(c)}
-                            className='text-sm border px-3 py-1 rounded hover:bg-gray-100'>Editar</button>
+                        <div className='flex gap-2'>
+                            <button
+                                onClick={() => handleEdit(c)}
+                                className='text-sm border px-3 py-1 rounded hover:bg-gray-100'>
+                                    Editar
+                            </button>
+                            <button
+                             onClick={() => remove(c.id)}
+                             disabled={isDeleting}
+                             className='text-sm border px-3 py-1 rounded hover:bg-red-50 text-red-600 disabled:opacity-50'>
+                                Eliminar
+                             </button>
+                        </div>
                     </li>
                 ))}
             </ul>
@@ -98,7 +108,7 @@ export default function CategoriesPage() {
                                         Cancelar
                                     </button>
                                     <button type='submit' disabled={isPending || isUpdating}
-                                        className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled-opacity-50'>
+                                        className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50'>
                                         {(isPending || isUpdating) ? 'Guardando...' : 'Guardar'}
                                         </button>
                                 </div>

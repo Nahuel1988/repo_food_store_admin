@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createCategory, fetchCategories, updateCategory } from '../services'
+import { createCategory, fetchCategories, updateCategory, deleteCategory } from '../services'
 import type { CreateCategoryDto } from '../types'
 
 export const useCategories = () => {
@@ -25,5 +25,12 @@ export const useCategories = () => {
     },
   })
 
-  return { data, isLoading, error, mutate, isPending, update, isUpdating }
+  const { mutate: remove, isPending: isDeleting } = useMutation({
+    mutationFn: (id: number) => deleteCategory(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories']})
+    }
+  })
+
+  return { data, isLoading, error, mutate, isPending, update, isUpdating, remove, isDeleting }
 }

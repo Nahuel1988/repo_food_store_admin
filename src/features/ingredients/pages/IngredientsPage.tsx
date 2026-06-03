@@ -6,7 +6,7 @@ import type { Ingredient } from '../types'
 export default function IngredientsPage() {
   const [open, setOpen] = useState(false)
   const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null)
-  const { data, isLoading, error, mutate, isPending, update, isUpdating } = useIngredients()
+  const { data, isLoading, error, mutate, isPending, update, isUpdating, remove, isDeleting } = useIngredients()
 
   const form = useForm({
     defaultValues: { nombre: '', descripcion: '', es_alergeno: false },
@@ -52,12 +52,19 @@ export default function IngredientsPage() {
               {i.es_alergeno && <span className='ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded'>Alérgeno</span>}
               {i.descripcion && <p className='text-gray-500 text-sm'>{i.descripcion}</p>}
             </div>
-            <button
-              onClick={() => handleEdit(i)}
-              className='text-sm border px-3 py-1 rounded hover:bg-gray-100'
-            >
-              Editar
-            </button>
+            <div className='flex gap-2'>
+              <button
+                onClick={() => handleEdit(i)}
+                className='text-sm border px-3 py-1 rounded hover:bg-gray-100'>
+                Editar
+              </button>
+              <button
+                onClick={() => remove(i.id)}
+                disabled={isDeleting}
+                className='text-sm border px-3 py-1 rounded hover:bg-red-50 text-red-600 disabled:opacity-50'>
+                  Eliminar
+              </button>
+            </div>
           </li>
         ))}
       </ul>

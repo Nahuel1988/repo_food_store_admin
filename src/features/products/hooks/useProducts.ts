@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createProduct, fetchProducts, updateProduct } from '../services'
+import { createProduct, fetchProducts, updateProduct, deleteProduct } from '../services'
 import type { CreateProductDto } from '../types'
 
 export const useProducts = () => {
@@ -25,5 +25,12 @@ export const useProducts = () => {
     },
   })
 
-  return { data, isLoading, error, mutate, isPending, update, isUpdating }
+  const { mutate: remove, isPending: isDeleting } = useMutation({
+    mutationFn: (id: number) => deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products']})
+    },
+  })
+
+  return { data, isLoading, error, mutate, isPending, update, isUpdating, remove, isDeleting }
 }
