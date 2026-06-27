@@ -12,6 +12,9 @@ export default function ProductsPage() {
   const { data: categories } = useCategories()
   const { data: ingredients } = useIngredients()
 
+  const [imageUrls, setImageUrls] = useState<string[]>([])
+  const [newUrl, setNewUrl] = useState('')
+
   //Guarda el producto que se está editando
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)//Product = editar | null = crear
 
@@ -19,11 +22,11 @@ export default function ProductsPage() {
     defaultValues: {nombre: '', precio_base: 0, descripcion: '', categoria_id: 0, ingrediente_ids: [] as number[]}, //Valores default (ingrediente_ids es array de numeros)
     onSubmit: async({value}) => { //value tiene todos los campos del form
       if (editingProduct) { //Si se está editando
-        update({id: editingProduct.id, body:value}) //Patch
+        update({id: editingProduct.id, body:{...value, imagenes_url: imageUrls}}) //Patch
       } else { //Si está creando
         mutate({ //Post
           ...value, //Copia los campos de value y agrega los que faltan hardcodeados
-          imagenes_url: [],
+          imagenes_url: imageUrls,
           disponible: true,
           stock_cantidad: 0,
         })
@@ -42,8 +45,17 @@ export default function ProductsPage() {
     form.setFieldValue('descripcion', product.descripcion ?? '') //Si no hay descripción guarda ''
     form.setFieldValue('categoria_id', product.categoria_id)
     form.setFieldValue('ingrediente_ids', product.ingrediente_ids)
+    setImageUrls(product.imagenes_url)
     setOpen(true)
   }
+
+  const handleAddUrl = () => {
+    if (newUrl.trim()) {
+      setImageUrls([...imageUrls, newUrl.trim()])
+      setNewUrl('')
+    }
+  }
+
 
   //Estados de carga
   if (isLoading) return <div>Cargando...</div>
@@ -57,6 +69,8 @@ export default function ProductsPage() {
         <button /*Botón de crear producto*/
           onClick={() => {
             form.reset()
+            setImageUrls([])
+            setNewUrl('')
             setEditingProduct(null)
             setOpen(true)
           }}
@@ -135,6 +149,30 @@ export default function ProductsPage() {
                     />
                   )}
                 </form.Field>
+                <div className='flex flex-col gap-2'>
+                  <label className='font-medium text-sm'>Imágenes</label>
+                  <div className='flex gap-2'>
+                    <input
+                      placeholder='URL de imagen'
+                      value={newUrl}
+                      onChange={(e) => setNewUrl(e.target.value)}
+                      className='border rounded px-3 py-2 flex-1'
+                    />
+                    <button type='button' onClick={handleAddUrl}
+                      className='border px-3 py-2 rounded hover:bg-gray-100'>
+                        Agregar
+                    </button>
+                  </div>
+                  {imageUrls.map((url, i) => (
+                    <div key={i} className='flex items-center gap-2 text-sm'>
+                      <span className='flex-1 truncate text-gray-600'>{url}</span>
+                      <button type='button'
+                        onClick={() => setImageUrls(imageUrls.filter((_, j) => j !== i))}
+                        className='text-red-500 hover:text-red-700'>✕</button>
+                    </div>
+                  ))}
+                </div>
+
                 <form.Field name="categoria_id">
                   {(field) => (
                     <select
