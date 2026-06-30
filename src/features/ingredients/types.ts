@@ -5,6 +5,7 @@ export interface Ingredient {
   es_alergeno: boolean
   is_active: boolean
   producto_ids: number[]
+  stock_cantidad: number
 }
 
 export interface CreateIngredientDto {
@@ -12,6 +13,7 @@ export interface CreateIngredientDto {
   descripcion: string
   es_alergeno: boolean
   producto_ids: number[]
+  stock_cantidad: number
 }
 
 export interface UnidadMedida {

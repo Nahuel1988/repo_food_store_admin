@@ -7,6 +7,7 @@ import ProtectedRoute from "@/shared/components/ProtectedRoute";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import OrdersPage from "@/features/orders/pages/OrdersPage";
 import KitchenPage from "@/features/orders/pages/KitchenPage";
+import StatsPage from "@/features/stats/pages/StatsPage";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,11 @@ const router = createBrowserRouter([
           path: 'kitchen',
           element: <ProtectedRoute roles={['ADMIN', 'COCINA']}/>,
           children:[{index: true, element: <KitchenPage/>}]
+        },
+        {
+          path: 'stats',
+          element: <ProtectedRoute roles={['ADMIN']}/>,
+          children:[{index: true, element: <StatsPage/>}]
         }
       ]}
     ],

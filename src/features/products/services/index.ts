@@ -22,3 +22,14 @@ export const updateProduct = async (id: number, body: Partial<CreateProductDto>)
 export const deleteProduct = async (id: number): Promise<void> => {
   await api.delete('/productos/' + id)
 }
+
+export const uploadImage = async (file: File): Promise<{ url: string; public_id: string }> => {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await api.post('/api/v1/upload/', form)
+  return data
+}
+
+export const deleteImage = async (url: string): Promise<void> => {
+  await api.delete('/api/v1/upload/', { params: { url } })
+}

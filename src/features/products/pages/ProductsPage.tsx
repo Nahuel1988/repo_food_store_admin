@@ -2,6 +2,7 @@ import { useProducts } from '../hooks/useProducts'
 import { useState, useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import type { Product } from '../types'
+import { uploadImage, deleteImage } from '../services'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useIngredients } from '@/features/ingredients/hooks/useIngredients'
 import { useUnidadesMedida } from '@/features/ingredients/hooks/useUnidadesMedida'
@@ -16,7 +17,7 @@ export default function ProductsPage() {
   const { data: unidadesMedida } = useUnidadesMedida()
 
   const [imageUrls, setImageUrls] = useState<string[]>([])
-  const [newUrl, setNewUrl] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
 
   //Guarda el producto que se está editando
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)//Product = editar | null = crear
@@ -103,10 +104,16 @@ export default function ProductsPage() {
     setOpen(true)
   }
 
-  const handleAddUrl = () => {
-    if (newUrl.trim()) {
-      setImageUrls([...imageUrls, newUrl.trim()])
-      setNewUrl('')
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsUploading(true)
+    try {
+      const { url } = await uploadImage(file)
+      setImageUrls((prev) => [...prev, url])
+    } finally {
+      setIsUploading(false)
+      e.target.value = ''
     }
   }
 
@@ -123,7 +130,6 @@ export default function ProductsPage() {
           onClick={() => {
             form.reset()
             setImageUrls([])
-            setNewUrl('')
             setIngredientesSeleccionados([])
             setEditingProduct(null)
             setOpen(true)
@@ -203,25 +209,22 @@ export default function ProductsPage() {
                     />
                   )}
                 </form.Field>
+
                 <div className='flex flex-col gap-2'>
                   <label className='font-medium text-sm'>Imágenes</label>
-                  <div className='flex gap-2'>
-                    <input
-                      placeholder='URL de imagen'
-                      value={newUrl}
-                      onChange={(e) => setNewUrl(e.target.value)}
-                      className='border rounded px-3 py-2 flex-1'
-                    />
-                    <button type='button' onClick={handleAddUrl}
-                      className='border px-3 py-2 rounded hover:bg-gray-100'>
-                        Agregar
-                    </button>
-                  </div>
+                  <label className={`flex items-center justify-center border rounded px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input type='file' accept='image/*' className='hidden' onChange={handleFileUpload} disabled={isUploading} />
+                    {isUploading ? 'Subiendo...' : 'Elegir imagen'}
+                  </label>
                   {imageUrls.map((url, i) => (
                     <div key={i} className='flex items-center gap-2 text-sm'>
+                      <img src={url} alt='' className='w-10 h-10 object-cover rounded' />
                       <span className='flex-1 truncate text-gray-600'>{url}</span>
                       <button type='button'
-                        onClick={() => setImageUrls(imageUrls.filter((_, j) => j !== i))}
+                        onClick={() => {
+                          deleteImage(url)
+                          setImageUrls(imageUrls.filter((_, j) => j !== i))
+                        }}
                         className='text-red-500 hover:text-red-700'>✕</button>
                     </div>
                   ))}

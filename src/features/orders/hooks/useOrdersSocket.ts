@@ -13,6 +13,10 @@ export const useOrdersSocket = (queryKey: string) => {
       queryClient.invalidateQueries({ queryKey: [queryKey] })
     }
 
+    socket.onclose = (event) => {
+      console.log('WS cerrado:', event.code, event.reason)
+    }
+
     return () => {
       socket.close()
     }

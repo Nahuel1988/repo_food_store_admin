@@ -9,7 +9,7 @@ export default function IngredientsPage() {
   const { data, isLoading, error, mutate, isPending, update, isUpdating, remove, isDeleting } = useIngredients()
 
   const form = useForm({
-    defaultValues: { nombre: '', descripcion: '', es_alergeno: false },
+    defaultValues: { nombre: '', descripcion: '', es_alergeno: false, stock_cantidad: 0 },
     onSubmit: async ({ value }) => {
       if (editingIngredient) {
         update({ id: editingIngredient.id, body: value })
@@ -26,6 +26,7 @@ export default function IngredientsPage() {
     form.setFieldValue('nombre', ingredient.nombre)
     form.setFieldValue('descripcion', ingredient.descripcion)
     form.setFieldValue('es_alergeno', ingredient.es_alergeno)
+    form.setFieldValue('stock_cantidad', ingredient.stock_cantidad)
     setOpen(true)
   }
 
@@ -91,6 +92,14 @@ export default function IngredientsPage() {
                 {(field) => (
                   <input placeholder='Descripción' value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
+                    className='border rounded px-3 py-2' />
+                )}
+              </form.Field>
+
+              <form.Field name="stock_cantidad">
+                {(field) => (
+                  <input type='number' placeholder='Stock' value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
                     className='border rounded px-3 py-2' />
                 )}
               </form.Field>
