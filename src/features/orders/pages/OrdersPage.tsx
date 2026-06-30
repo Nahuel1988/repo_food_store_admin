@@ -1,9 +1,10 @@
 import { useOrders } from '../hooks/useOrders'
+import { useOrdersSocket } from '../hooks/useOrdersSocket'
 
 const NEXT_STATE: Record<string, string | null> = {
   PENDIENTE: 'CONFIRMADO',
-  CONFIRMADO: 'EN_PREP',
-  EN_PREP: 'EN_CAMINO',
+  CONFIRMADO: null,
+  EN_PREP: null,
   EN_CAMINO: 'ENTREGADO',
   ENTREGADO: null,
   CANCELADO: null,
@@ -11,6 +12,7 @@ const NEXT_STATE: Record<string, string | null> = {
 
 export default function OrdersPage() {
   const { data, isLoading, error, update, isUpdating } = useOrders()
+  useOrdersSocket('orders')
 
   if (isLoading) return <div>Cargando...</div>
   if (error) return <div>Error al cargar pedidos</div>
@@ -34,7 +36,7 @@ export default function OrdersPage() {
                 {nextState && (
                   <button
                     disabled={isUpdating}
-                    onClick={() => update({ id: o.id, body: { estado_codigo: nextState } })}
+                    onClick={() => update({ id: o.id, body: { nuevo_estado: nextState } })}
                     className='text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50'>
                     → {nextState}
                   </button>
@@ -42,7 +44,7 @@ export default function OrdersPage() {
                 {o.estado_codigo !== 'CANCELADO' && o.estado_codigo !== 'ENTREGADO' && (
                   <button
                     disabled={isUpdating}
-                    onClick={() => update({ id: o.id, body: { estado_codigo: 'CANCELADO' } })}
+                    onClick={() => update({ id: o.id, body: { nuevo_estado: 'CANCELADO' } })}
                     className='text-sm border px-3 py-1 rounded text-red-600 hover:bg-red-50 disabled:opacity-50'>
                     Cancelar
                   </button>

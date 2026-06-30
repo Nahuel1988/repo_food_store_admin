@@ -3,7 +3,7 @@ import type { User, Role } from "../types"
 import axios from 'axios'
 
 const authApi = axios.create({ //Api propia de Auth
-    baseURL: '/usuarios/api/v1',
+    baseURL: import.meta.env.VITE_API_URL + '/api/v1',
     withCredentials: true,
 })
 

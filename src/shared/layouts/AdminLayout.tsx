@@ -5,7 +5,8 @@ const links = [
   { to: '/products', label: 'Productos' },
   { to: '/categories', label: 'Categorías' },
   { to: '/ingredients', label: 'Ingredientes' },
-  { to: '/orders', label: 'Pedidos' }
+  { to: '/orders', label: 'Pedidos' },
+  { to: '/kitchen', label: 'Cocina' }
 ]
 
 export default function AdminLayout() {

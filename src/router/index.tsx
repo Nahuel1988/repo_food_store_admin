@@ -6,6 +6,7 @@ import IngredientsPage from "@/features/ingredients/pages/IngredientsPage";
 import ProtectedRoute from "@/shared/components/ProtectedRoute";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import OrdersPage from "@/features/orders/pages/OrdersPage";
+import KitchenPage from "@/features/orders/pages/KitchenPage";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
         {index: true, element: <Navigate to="/products" replace/>}, //Redirige a productos cuando la URL es "/"
         {
           path: 'products',
-          element: <ProtectedRoute roles={['ADMIN']}/>,
+          element: <ProtectedRoute roles={['ADMIN', 'STOCK']}/>,
           children:[{index: true, element: <ProductsPage/>}]
         },
         {
@@ -26,13 +27,18 @@ const router = createBrowserRouter([
         },
         {
           path: 'ingredients',
-          element: <ProtectedRoute roles={['ADMIN']}/>,
+          element: <ProtectedRoute roles={['ADMIN', 'STOCK']}/>,
           children:[{index: true, element: <IngredientsPage/>}]
         },
         {
           path: 'orders',
           element: <ProtectedRoute roles={['ADMIN', 'PEDIDOS']}/>,
           children:[{index: true, element: <OrdersPage/>}]
+        },
+        {
+          path: 'kitchen',
+          element: <ProtectedRoute roles={['ADMIN', 'COCINA']}/>,
+          children:[{index: true, element: <KitchenPage/>}]
         }
       ]}
     ],
